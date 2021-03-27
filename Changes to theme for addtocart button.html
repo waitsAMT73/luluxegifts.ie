@@ -1,0 +1,58 @@
+AddtoCart button solution for catalog page
+
+add this to theme.liquid before the </head>
+
+<script src="{{ 'custom.js' | asset_url }}" defer></script> 
+
+create a custom.js file in the assets folder with this code
+
+function addItemToCart(variant_id, qty, elmt) {
+  
+  let formData = {
+   'items': [{
+    'id': variant_id,
+    'quantity': qty
+    }]
+  };
+  
+  console.log(JSON.stringify(formData));
+  
+
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => {
+    elmt.innerHTML = "Item Added!";
+    return response.json();
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    elmt.innerHTML = error.description;
+  });
+
+}
+
+
+add this the end of the product-card-grid.liquid file
+
+{% if product.available %}
+<button id="btn_{{ product.variants.first.id }}" class="btn" value="{{ product.variants.first.id }}" onclick="addItemToCart({{ product.variants.first.id }},1,this)">
+  Add to Cart</button>
+{% else %}
+<button class="btn" disabled>Sorry, this product is sold out.</button>
+{% endif %}
+
+
+<button type="submit" name="add" aria-label="Add to cart" class="btn product-form__cart-submit btn--secondary-accent" aria-haspopup="dialog" data-add-to-cart="">
+<span data-add-to-cart-text="">
+  Add to cart
+</span>
+<span class="hide" data-loader="">
+<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-spinner" viewBox="0 0 20 20"><path d="M7.229 1.173a9.25 9.25 0 1 0 11.655 11.412 1.25 1.25 0 1 0-2.4-.698 6.75 6.75 0 1 1-8.506-8.329 1.25 1.25 0 1 0-.75-2.385z" fill="#919EAB"></path></svg>
+</span>
+</button>
+
